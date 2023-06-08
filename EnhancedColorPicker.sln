@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EnhancedColorPicker", "EnhancedColorPicker\EnhancedColorPicker.vcxproj", "{07FC5B61-B575-4207-B464-AFAE6AF3FC19}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F057451A-1413-4D68-AF56-1BF529933420} = {F057451A-1413-4D68-AF56-1BF529933420}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Spore ModAPI", "..\..\Spore ModAPI SDK\Spore ModAPI\Spore ModAPI.vcxproj", "{F057451A-1413-4D68-AF56-1BF529933420}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07FC5B61-B575-4207-B464-AFAE6AF3FC19}.Debug|x86.ActiveCfg = Debug|Win32
+		{07FC5B61-B575-4207-B464-AFAE6AF3FC19}.Debug|x86.Build.0 = Debug|Win32
+		{07FC5B61-B575-4207-B464-AFAE6AF3FC19}.Release|x86.ActiveCfg = Release|Win32
+		{07FC5B61-B575-4207-B464-AFAE6AF3FC19}.Release|x86.Build.0 = Release|Win32
+		{F057451A-1413-4D68-AF56-1BF529933420}.Debug|x86.ActiveCfg = Debug|Win32
+		{F057451A-1413-4D68-AF56-1BF529933420}.Debug|x86.Build.0 = Debug|Win32
+		{F057451A-1413-4D68-AF56-1BF529933420}.Release|x86.ActiveCfg = Release|Win32
+		{F057451A-1413-4D68-AF56-1BF529933420}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C5B8DD5-07B3-4852-AB32-68094A4A967A}
+	EndGlobalSection
+EndGlobal
