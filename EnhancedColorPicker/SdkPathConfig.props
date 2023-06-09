@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <SporeSdkPath>E:\Eric\Spore ModAPI SDK\</SporeSdkPath>
-	<SporeLauncherPath>E:\Eric\Spore ModAPI\Development Folder\</SporeLauncherPath>
+    <SporeLauncherPath>E:\Eric\Spore ModAPI\Development Folder\</SporeLauncherPath>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

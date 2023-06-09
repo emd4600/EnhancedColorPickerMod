@@ -19,59 +19,29 @@
     <ClInclude Include="stdafx.h">
       <Filter>Internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\ColorPickerUIDetour.h">
+    <ClInclude Include="ColorPickerUIDetour.h">
       <Filter>EnhancedColorPicker</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\ColorWheelSwatchUI.h">
-      <Filter>EnhancedColorPicker</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\stdafx.h">
-      <Filter>EnhancedColorPicker</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\targetver.h">
+    <ClInclude Include="ColorWheelSwatchUI.h">
       <Filter>EnhancedColorPicker</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>EnhancedColorPicker</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Internal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\ColorWheelSwatchUI.cpp">
+    <ClCompile Include="ColorPickerUIDetour.cpp">
       <Filter>EnhancedColorPicker</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\dllmain.cpp">
+    <ClCompile Include="ColorWheelSwatchUI.cpp">
       <Filter>EnhancedColorPicker</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\EnhancedColorListener.cpp">
-      <Filter>EnhancedColorPicker</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\stdafx.cpp">
-      <Filter>EnhancedColorPicker</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\ColorPickerUIDetour.cpp">
+    <ClCompile Include="dllmain.cpp">
       <Filter>EnhancedColorPicker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SdkPathConfig.props" />
-    <None Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\EnhancedColorPicker.vcxproj">
-      <Filter>EnhancedColorPicker</Filter>
-    </None>
-    <None Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\EnhancedColorPicker.vcxproj.filters">
-      <Filter>EnhancedColorPicker</Filter>
-    </None>
-    <None Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\EnhancedColorPicker.vcxproj.user">
-      <Filter>EnhancedColorPicker</Filter>
-    </None>
-    <None Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\README.md">
-      <Filter>EnhancedColorPicker</Filter>
-    </None>
-    <None Include="..\..\..\Spore ModAPI SDK\Projects\Example Projects\EnhancedColorPicker\SdkPathConfig.props">
-      <Filter>EnhancedColorPicker</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt">

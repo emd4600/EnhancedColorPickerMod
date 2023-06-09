@@ -1,28 +1,21 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "stdafx.h"
+#include "ColorPickerUIDetour.h"
+#include "ColorWheelSwatchUI.h"
 
 void Initialize()
 {
-	// This method is executed when the game starts, before the user interface is shown
-	// Here you can do things such as:
-	//  - Add new cheats
-	//  - Add new simulator classes
-	//  - Add new game modes
-	//  - Add new space tools
-	//  - Change materials
 }
 
 void Dispose()
 {
-	// This method is called when the game is closing
 }
 
 void AttachDetours()
 {
-	// Call the attach() method on any detours you want to add
-	// For example: cViewer_SetRenderType_detour::attach(GetAddress(cViewer, SetRenderType));
+	ColorPickerUI_Load_detour::attach(GetAddress(Palettes::ColorPickerUI, Load));
+	ColorSwatchUI_Update_detour::attach(GetAddress(Palettes::ColorSwatchUI, Update));
 }
-
 
 // Generally, you don't need to touch any code here
 BOOL APIENTRY DllMain( HMODULE hModule,
