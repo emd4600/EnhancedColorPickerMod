@@ -220,10 +220,10 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeRepaint);
 	}
 
-	if (window == mpValueWindow || window == mpWheelWindow || (mpTextField &&
+	/*if (window == mpValueWindow || window == mpWheelWindow || (mpTextField &&
 		(window == mpTextField->ToWindow() || window == mpTextField->ToWindow()->GetParent()))) {
 		return true;
-	}
+	}*/
 
 	if (msg.IsType(UTFWin::kMsgRefresh) && (msg.Refresh.window == mpValueWindow || msg.Refresh.window == mpWheelWindow || (mpTextField != nullptr &&
 		(msg.Refresh.window == mpTextField->ToWindow() || msg.Refresh.window == mpTextField->ToWindow()->GetParent())))) {
@@ -434,6 +434,7 @@ void ColorWheelSwatchUI::ColorChanged(bool sendSporeMessage)
 
 		if (sendSporeMessage)
 		{
+			App::ConsolePrintF("Sending Spore message");
 			Editors::ColorChangedMessage msg(
 				mColor.ToIntColor(), mpExpansionObject.get(), chooser->mRegionFilter, mIsDefaultColor, mColorIndex);
 			MessageManager.MessageSend(msg.id, &msg);
