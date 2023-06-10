@@ -10,6 +10,17 @@
 // To use min and max
 #include <algorithm>
 
+/// For compatibility with AdvancedCreaturePaint
+const uint32_t ACP_CATEGORY_ID = id("ACP_ce_category_paintbrush");
+
+// Checks if the Editor is currently in the advanced creature paint category
+bool IsAdvancedPaintCategory()
+{
+	if (!Editor.IsMode(Editors::Mode::PaintMode)) return false;
+	auto activeCategory = Editor.mpPaintPaletteUI->mpActiveCategory;
+	return activeCategory && activeCategory->mpCategory->mCategoryID == ACP_CATEGORY_ID;
+}
+
 ColorWheelSwatchUI::ColorWheelSwatchUI()
 	: mPanelLayout()
 	, mpWheelWindow()
@@ -18,7 +29,7 @@ ColorWheelSwatchUI::ColorWheelSwatchUI()
 	, mpValueCursor()
 	, mpPreviewWindow()
 	, mpTextField()
-	, mIsSelectingColor(false)
+	, mEditingColorType(EditingType::None)
 	, mMouseWheelRange(0)
 	, mHsvColor(0, 0, 1.0f)
 {
@@ -46,7 +57,7 @@ void ColorWheelSwatchUI::TextValueChanged(const UTFWin::Message& msg)
 			mHsvColor = Math::RGBtoHSV(color);
 
 			//TODO when should we send a spore message?
-			ColorChanged(true, false);
+			ColorChanged(true, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeRepaint);
 		}
 	}
 }
@@ -78,7 +89,7 @@ void ColorWheelSwatchUI::WheelValueChanged(const UTFWin::Message& msg)
 
 	if (mHsvColor.s > 1.0f) mHsvColor.s = 1.0f;
 
-	ColorChanged(false, false);
+	ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeRepaint);
 }
 
 void ColorWheelSwatchUI::SliderValueChanged(const UTFWin::Message& msg)
@@ -86,11 +97,13 @@ void ColorWheelSwatchUI::SliderValueChanged(const UTFWin::Message& msg)
 	mHsvColor.v = 1.0f - msg.Mouse.mouseX / mpValueWindow->GetArea().GetWidth();
 
 	mpValueWindow->SetShadeColor(Math::ColorRGBA(mHsvColor.v, mHsvColor.v, mHsvColor.v, 1.0f).ToIntColor());
-	ColorChanged(false, false);
+	ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeRepaint);
 }
 
 bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::Message& msg)
 {
+	if (!mIsLoaded) return false;
+
 	if (msg.IsType(UTFWin::kMsgKeyDown) && msg.Key.vkey == VK_RETURN) {
 		// Some users like pressing the Enter key when finished changing the color. 
 		// We replace the ENTER key behaviour this here so it doesn't exit the editor like it would normally do.
@@ -98,24 +111,47 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}
 
+	if (mIsShowingPanel &&
+		mEditingColorType != EditingType::None && 
+		msg.IsType(UTFWin::kMsgRefresh) &&
+		msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
+		msg.Refresh.window == mpExpansionWindow)
+	{
+		Hide();
+		return true;
+	}
+
+	if (msg.IsType(UTFWin::kMsgMouseUp)) {
+		App::ConsolePrintF("kMsgMouseUp");
+	}
+
 	/* Update color (if the event happened in the wheel or value windows) */
 	if (msg.IsType(UTFWin::kMsgMouseMove) || msg.IsType(UTFWin::kMsgMouseDown))
 	{
-		if (msg.IsType(UTFWin::kMsgMouseDown) && (window == mpWheelWindow || window == mpValueWindow)) {
-			mIsSelectingColor = true;
+		auto newEditingType = EditingType::None;
+		if (window == mpWheelWindow) newEditingType = EditingType::ColorWheel;
+		if (window == mpValueWindow) newEditingType = EditingType::ValueSlider;
+
+		if (msg.IsType(UTFWin::kMsgMouseDown) && 
+			msg.Mouse.IsLeftButton() &&
+			(window == mpWheelWindow || window == mpValueWindow)) 
+		{
+			mEditingColorType = newEditingType;
 		}
 
-		if (mIsSelectingColor)
+		// Only edit if we are moving the mouse in the same place where we clicked
+		if (newEditingType == mEditingColorType)
 		{
-			if (window == mpWheelWindow)
+			switch (mEditingColorType)
 			{
-				if (msg.Mouse.IsLeftButton()) WheelValueChanged(msg);
+			case EditingType::ColorWheel:
+				WheelValueChanged(msg);
 				return true;
-			}
-			else if (window == mpValueWindow)
-			{
-				if (msg.Mouse.IsLeftButton()) SliderValueChanged(msg);
+			case EditingType::ValueSlider:
+				SliderValueChanged(msg);
 				return true;
+			default:
+				break;
 			}
 		}
 	}
@@ -123,11 +159,11 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	has to do (for example, adding an undo action) */
 	else if (msg.IsType(UTFWin::kMsgMouseUp))
 	{
-		if (mIsSelectingColor)
+		if (mEditingColorType != EditingType::None)
 		{
-			mIsSelectingColor = false;
-
-			if (window == mpWheelWindow || window == mpValueWindow) ColorChanged(false, true);
+			mEditingColorType = EditingType::None;
+			ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeMessage);
+			//TODO close swatch window if mouse is outside
 		}
 	}
 	/* Update color when we change the text field */
@@ -140,12 +176,12 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	{
 		ColorChanged(true);
 	}
-	else if (msg.IsType(UTFWin::kMsgMouseWheel) && mIsSelectingColor &&
+	else if (msg.IsType(UTFWin::kMsgMouseWheel) && mEditingColorType != EditingType::None &&
 		(window == mpWheelWindow || window == mpValueWindow))
 	{
 		mHsvColor.v += msg.MouseWheel.wheelDelta / (float)mMouseWheelRange;
 		mHsvColor.v = min(max(mHsvColor.v, 0.0f), 1.0f);
-		ColorChanged(false, false);
+		ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeRepaint);
 	}
 
 	if (window == mpValueWindow || window == mpWheelWindow || (mpTextField &&
@@ -333,13 +369,21 @@ void ColorWheelSwatchUI::UpdateTints(bool updateText)
 	if (updateText) SetTextColor(intColor);
 }
 
-void ColorWheelSwatchUI::ColorChanged(bool frommTextField, bool sendSporeMessage)
+void ColorWheelSwatchUI::ColorChanged(bool fromTextField, ColorChangeType type)
 {
 	mColor = Math::HSVtoRGB(mHsvColor);
 
 	UpdateCursorPositions();
-	UpdateTints(!frommTextField);
-	ColorChanged(sendSporeMessage);
+	UpdateTints(!fromTextField);
+
+	if (type == ColorChangeType::UpdateSporeMessage)
+	{
+		ColorChanged(true);
+	}
+	else if (type == ColorChangeType::UpdateSporeRepaint)
+	{
+		ColorChanged(false);
+	}
 }
 
 void ColorWheelSwatchUI::ColorChanged(bool sendSporeMessage)

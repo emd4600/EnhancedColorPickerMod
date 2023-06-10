@@ -31,6 +31,19 @@ public:
 	virtual void Update(int, bool);
 
 protected:
+	enum class EditingType
+	{
+		None,
+		ColorWheel,
+		ValueSlider
+	};
+	enum class ColorChangeType
+	{
+		OnlyUpdateUI,
+		UpdateSporeMessage,
+		UpdateSporeRepaint
+	};
+
 	// We separate the panel creation in multiple steps,
 	// virtual for if anyone wants to extend this class
 	virtual void InitPanel(uint32_t colorpickerImageGroupID);
@@ -44,7 +57,7 @@ protected:
 	virtual void SliderValueChanged(const UTFWin::Message& msg);
 	virtual void TextValueChanged(const UTFWin::Message& msg);
 	virtual void ColorChanged(bool sendSporeMessage);
-	virtual void ColorChanged(bool fromTextField, bool sendSporeMessage);
+	virtual void ColorChanged(bool fromTextField, ColorChangeType type);
 
 	virtual void UpdateTints(bool updateText);
 
@@ -83,7 +96,7 @@ protected:
 	// The currently selected color
 	Math::ColorHSV mHsvColor;
 
-	bool mIsSelectingColor;
+	EditingType mEditingColorType;
 
 	// The value needed to scroll from value 0 to 1
 	int mMouseWheelRange;
