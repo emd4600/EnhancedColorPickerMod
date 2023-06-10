@@ -111,15 +111,51 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}
 
-	if (mIsShowingPanel &&
-		mEditingColorType != EditingType::None && 
-		msg.IsType(UTFWin::kMsgRefresh) &&
-		msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
-		msg.Refresh.window == mpExpansionWindow)
-	{
-		Hide();
-		return true;
-	}
+	//if (msg.IsType(UTFWin::kMsgMouseLeave))
+	//{
+	//	App::ConsolePrintF("ExpansionWindow [%x, ControlID=%x]     MessageWindow [%x, ControlID=%x]",
+	//		mpExpansionWindow.get(), mpExpansionWindow->GetControlID(),
+	//		msg.MouseLeave.window, msg.MouseLeave.window->GetControlID());
+	//	App::ConsolePrintF("LEAVE %x  %x   %d   %d", msg.MouseLeave.window->GetControlID(), window->GetControlID(), mIsShowingPanel, mEditingColorType);
+	//}
+
+	//if (msg.IsType(UTFWin::kMsgStateChanged) && window == mpExpansionWindow) {
+	//	App::ConsolePrintF("STATE CHANGED %d  %d", msg.StateChanged.oldState, msg.StateChanged.newState);
+	//}
+
+	//if (mIsShowingPanel &&
+	//	//mEditingColorType == EditingType::None && 
+	//	msg.IsType(UTFWin::kMsgRefresh) &&
+	//	msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
+	//	msg.Refresh.window == mpExpansionWindow)
+	//{
+	//	/*App::ConsolePrintF("CALLING Hide()");
+	//	Hide();*/
+	//	return true;
+	//}
+
+	//if (msg.IsType(UTFWin::kMsgMouseEnter))
+	//{
+	//	App::ConsolePrintF("ENTER  %x", msg.MouseEnter.window->GetControlID());
+	//}
+
+	//if (mIsShowingPanel &&
+	//	//mEditingColorType == EditingType::None &&
+	//	msg.IsType(UTFWin::kMsgMouseLeave) &&
+	//	msg.MouseLeave.window == mpExpansionWindow)
+	//{
+	//	int mouseX = Renderer.GetScreenInfo().mouseX;
+	//	int mouseY = Renderer.GetScreenInfo().mouseY;
+	//	Math::Point point;
+	//	mpExpansionWindow->ToLocalCoordinates2({ float(mouseX), float(mouseY) }, point);
+	//	bool insidePanel = mpExpansionWindow->ContainsPoint({ float(mouseX), float(mouseY) });
+	//	App::ConsolePrintF("%d     %f %f", insidePanel, point.x, point.y);
+
+	//	App::ConsolePrintF("CALLING Hide(), %d", mpExpansionWindow->GetRealArea().Contains({ float(mouseX), float(mouseY) }));
+	//	mpMainWindow->SetFlag(UTFWin::kWinFlagVisible, true);
+	//	Hide();
+	//	return true;
+	//}
 
 	if (msg.IsType(UTFWin::kMsgMouseUp)) {
 		App::ConsolePrintF("kMsgMouseUp");
@@ -189,8 +225,8 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}
 
-	if (msg.Refresh.window == mpValueWindow || msg.Refresh.window == mpWheelWindow || (mpTextField != nullptr &&
-		(msg.Refresh.window == mpTextField->ToWindow() || msg.Refresh.window == mpTextField->ToWindow()->GetParent()))) {
+	if (msg.IsType(UTFWin::kMsgRefresh) && (msg.Refresh.window == mpValueWindow || msg.Refresh.window == mpWheelWindow || (mpTextField != nullptr &&
+		(msg.Refresh.window == mpTextField->ToWindow() || msg.Refresh.window == mpTextField->ToWindow()->GetParent())))) {
 		return true;
 	}
 
@@ -203,8 +239,6 @@ void ColorWheelSwatchUI::InitPanel(uint32_t colorpickerImageGroupID)
 	mpExpansionWindow->SetFlag(UTFWin::kWinFlagVisible, false);
 	// We want this window to ignore mouse events
 	mpExpansionWindow->SetFlag(UTFWin::kWinFlagIgnoreMouse, false);
-	// Doing this, whenever an event happens in the main window our class gets notified
-	mpExpansionWindow->AddWinProc(this);
 }
 
 void ColorWheelSwatchUI::InitWheelWindow(uint32_t colorpickerImageGroupID)
@@ -513,6 +547,9 @@ void ColorWheelSwatchUI::Update(int msTime, bool arg_4)
 					}
 				}
 
+				// Doing this, whenever an event happens in the main window our class gets notified
+				mpExpansionWindow->AddWinProc(this);
+
 				// UI Layer manager, PLACEHOLDER what does this do?
 				CALL(Address(ModAPI::ChooseAddress(0x80DD00, 0x80D7B0)), void, 
 					Args(UI::cLayerManager*, UTFWin::IWindow*, int, int),
@@ -529,6 +566,17 @@ void ColorWheelSwatchUI::Update(int msTime, bool arg_4)
 		}
 		// more things here, but I think they never happen
 	}
+
+	/*int mouseX = Renderer.GetScreenInfo().mouseX;
+	int mouseY = Renderer.GetScreenInfo().mouseY;
+	Math::Point point;
+	mpExpansionWindow->ToLocalCoordinates2({ float(mouseX), float(mouseY) }, point);
+	bool insidePanel = mpExpansionWindow->ContainsPoint({ float(mouseX), float(mouseY) });
+	App::ConsolePrintF("%d     %f %f", insidePanel, point.x, point.y);
+
+	mpExpansionWindow->ToLocalCoordinates2({ float(mouseX), float(mouseY) }, point);
+	insidePanel = mpExpansionWindow->ContainsPoint({ float(mouseX), float(mouseY) });
+	App::ConsolePrintF("%d     %f %f", insidePanel, point.x, point.y);*/
 }
 
 void ColorWheelSwatchUI::UpdateCursorPositions()
