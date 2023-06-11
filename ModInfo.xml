@@ -1,0 +1,9 @@
+<mod displayName="Enhanced Color Picker" unique="EnhancedColorPicker" description="Enables Color Wheel in Editors." installerSystemVersion="1.0.1.2" hasCustomInstaller="false" dllsBuild="2.5.277">
+	<remove>EnhancedColorPicker.dll</remove>
+	<remove>SporeEnhancedColorPicker-disk.dll</remove>
+	<remove>SporeEnhancedColorPicker-steam.dll</remove>
+	<remove>SporeEnhancedColorPicker-steam_patched.dll</remove>
+	<remove game="GalacticAdventures">EnhancedColorPicker.package</remove>
+	<prerequisite>EnhancedColorPicker.dll</prerequisite>
+	<prerequisite game="GalacticAdventures">EnhancedColorPicker.package</prerequisite>
+</mod>
