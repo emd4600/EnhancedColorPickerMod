@@ -14,7 +14,7 @@ bool ColorPickerUI_Load_detour::DETOUR(
 
 	mRegionFilter = regionFilter;
 	mpWindow = pWindow;
-	field_0C = nullptr;
+	mpSelectedColorSwatch = nullptr;
 	mpPropList = nullptr;
 
 	// Try to get the configuration .prop file

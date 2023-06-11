@@ -111,6 +111,16 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}
 
+	/*if (msg.IsType(UTFWin::kMsgRefresh) && 
+		msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
+		msg.Refresh.window != mpExpansionWindow) 
+	{
+		int mouseX = Renderer.GetScreenInfo().mouseX;
+		int mouseY = Renderer.GetScreenInfo().mouseY;
+		bool isInside = mpExpansionWindow->GetRealArea().Contains({ float(mouseX), float(mouseY) });
+		App::ConsolePrintF("REFRESH %x  %d", msg.Refresh.window->GetControlID(), isInside);
+	}*/
+
 	//if (msg.IsType(UTFWin::kMsgMouseLeave))
 	//{
 	//	App::ConsolePrintF("ExpansionWindow [%x, ControlID=%x]     MessageWindow [%x, ControlID=%x]",
@@ -157,10 +167,6 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	//	return true;
 	//}
 
-	if (msg.IsType(UTFWin::kMsgMouseUp)) {
-		App::ConsolePrintF("kMsgMouseUp");
-	}
-
 	/* Update color (if the event happened in the wheel or value windows) */
 	if (msg.IsType(UTFWin::kMsgMouseMove) || msg.IsType(UTFWin::kMsgMouseDown))
 	{
@@ -197,6 +203,7 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	{
 		if (mEditingColorType != EditingType::None)
 		{
+			App::ConsolePrintF("kMsgMouseUp   %d", mEditingColorType);
 			mEditingColorType = EditingType::None;
 			ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeMessage);
 			//TODO close swatch window if mouse is outside
@@ -208,9 +215,12 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		TextValueChanged(msg);
 	}
 	/* Send the color (if necessary) when we have finished editing */
-	else if (msg.IsType(UTFWin::kMsgMouseLeave) && object_cast<UTFWin::ITextEdit>(window) == mpTextField)
+	else if (msg.IsType(UTFWin::kMsgMouseLeave) && 
+		mEditingColorType == EditingType::None && 
+		object_cast<UTFWin::ITextEdit>(window) == mpTextField)
 	{
-		ColorChanged(true);
+		if (mColor.ToIntColor() == mOriginalColor.ToIntColor()) 
+			ColorChanged(true);
 	}
 	else if (msg.IsType(UTFWin::kMsgMouseWheel) && mEditingColorType != EditingType::None &&
 		(window == mpWheelWindow || window == mpValueWindow))
@@ -225,8 +235,13 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}*/
 
-	if (msg.IsType(UTFWin::kMsgRefresh) && (msg.Refresh.window == mpValueWindow || msg.Refresh.window == mpWheelWindow || (mpTextField != nullptr &&
-		(msg.Refresh.window == mpTextField->ToWindow() || msg.Refresh.window == mpTextField->ToWindow()->GetParent())))) {
+	if (msg.IsType(UTFWin::kMsgRefresh) && 
+		(msg.Refresh.window == mpValueWindow || 
+			msg.Refresh.window == mpWheelWindow || 
+			msg.Refresh.window == mpValueCursor ||
+			msg.Refresh.window == mpWheelCursor ||
+			(mpTextField != nullptr && (msg.Refresh.window == mpTextField->ToWindow() || 
+				msg.Refresh.window == mpTextField->ToWindow()->GetParent())))) {
 		return true;
 	}
 
@@ -424,23 +439,24 @@ void ColorWheelSwatchUI::ColorChanged(bool sendSporeMessage)
 {
 	if (mpExpansionObject)
 	{
-		if (mColor.ToIntColor() == mOriginalColor.ToIntColor()) return;
+		if (!sendSporeMessage && mColor.ToIntColor() == mOriginalColor.ToIntColor()) return;
 
 		// We know it's the color picker, we cast it to get information
-		auto chooser = object_cast<Palettes::ColorPickerUI>(mpExpansionObject.get());
+		auto picker = object_cast<Palettes::ColorPickerUI>(mpExpansionObject.get());
 
-		chooser->SetColor(mColor);
+		picker->SetColor(mColor);
 		mOriginalColor = mColor;
 
 		if (sendSporeMessage)
 		{
 			App::ConsolePrintF("Sending Spore message");
+			picker->mpSelectedColorSwatch = this;
 			Editors::ColorChangedMessage msg(
-				mColor.ToIntColor(), mpExpansionObject.get(), chooser->mRegionFilter, mIsDefaultColor, mColorIndex);
+				mColor.ToIntColor(), mpExpansionObject.get(), picker->mRegionFilter, false, mColorIndex);
 			MessageManager.MessageSend(msg.id, &msg);
 		}
 		else {
-			ChangeCreationColor(chooser->mRegionFilter, mColor);
+			ChangeCreationColor(picker->mRegionFilter, mColor);
 		}
 
 		// must replace loc_592D6D
