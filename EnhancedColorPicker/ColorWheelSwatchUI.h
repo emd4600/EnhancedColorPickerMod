@@ -103,4 +103,4 @@ protected:
 };
 
 // As explained before, we cannot override the Update method as it's not virtual, so detour it
-member_detour(ColorSwatchUI_Update_detour, Palettes::ColorSwatchUI, void(int, bool)) {};
+member_detour(ColorSwatchUI_Update__detour, Palettes::ColorSwatchUI, void(int, bool)) {};

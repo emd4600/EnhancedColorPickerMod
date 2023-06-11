@@ -13,8 +13,8 @@ void Dispose()
 
 void AttachDetours()
 {
-	ColorPickerUI_Load_detour::attach(GetAddress(Palettes::ColorPickerUI, Load));
-	ColorSwatchUI_Update_detour::attach(GetAddress(Palettes::ColorSwatchUI, Update));
+	ColorPickerUI_Load__detour::attach(GetAddress(Palettes::ColorPickerUI, Load));
+	ColorSwatchUI_Update__detour::attach(GetAddress(Palettes::ColorSwatchUI, Update));
 }
 
 // Generally, you don't need to touch any code here

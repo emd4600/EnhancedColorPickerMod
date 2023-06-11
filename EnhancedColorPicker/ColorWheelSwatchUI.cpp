@@ -111,62 +111,6 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}
 
-	/*if (msg.IsType(UTFWin::kMsgRefresh) && 
-		msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
-		msg.Refresh.window != mpExpansionWindow) 
-	{
-		int mouseX = Renderer.GetScreenInfo().mouseX;
-		int mouseY = Renderer.GetScreenInfo().mouseY;
-		bool isInside = mpExpansionWindow->GetRealArea().Contains({ float(mouseX), float(mouseY) });
-		App::ConsolePrintF("REFRESH %x  %d", msg.Refresh.window->GetControlID(), isInside);
-	}*/
-
-	//if (msg.IsType(UTFWin::kMsgMouseLeave))
-	//{
-	//	App::ConsolePrintF("ExpansionWindow [%x, ControlID=%x]     MessageWindow [%x, ControlID=%x]",
-	//		mpExpansionWindow.get(), mpExpansionWindow->GetControlID(),
-	//		msg.MouseLeave.window, msg.MouseLeave.window->GetControlID());
-	//	App::ConsolePrintF("LEAVE %x  %x   %d   %d", msg.MouseLeave.window->GetControlID(), window->GetControlID(), mIsShowingPanel, mEditingColorType);
-	//}
-
-	//if (msg.IsType(UTFWin::kMsgStateChanged) && window == mpExpansionWindow) {
-	//	App::ConsolePrintF("STATE CHANGED %d  %d", msg.StateChanged.oldState, msg.StateChanged.newState);
-	//}
-
-	//if (mIsShowingPanel &&
-	//	//mEditingColorType == EditingType::None && 
-	//	msg.IsType(UTFWin::kMsgRefresh) &&
-	//	msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
-	//	msg.Refresh.window == mpExpansionWindow)
-	//{
-	//	/*App::ConsolePrintF("CALLING Hide()");
-	//	Hide();*/
-	//	return true;
-	//}
-
-	//if (msg.IsType(UTFWin::kMsgMouseEnter))
-	//{
-	//	App::ConsolePrintF("ENTER  %x", msg.MouseEnter.window->GetControlID());
-	//}
-
-	//if (mIsShowingPanel &&
-	//	//mEditingColorType == EditingType::None &&
-	//	msg.IsType(UTFWin::kMsgMouseLeave) &&
-	//	msg.MouseLeave.window == mpExpansionWindow)
-	//{
-	//	int mouseX = Renderer.GetScreenInfo().mouseX;
-	//	int mouseY = Renderer.GetScreenInfo().mouseY;
-	//	Math::Point point;
-	//	mpExpansionWindow->ToLocalCoordinates2({ float(mouseX), float(mouseY) }, point);
-	//	bool insidePanel = mpExpansionWindow->ContainsPoint({ float(mouseX), float(mouseY) });
-	//	App::ConsolePrintF("%d     %f %f", insidePanel, point.x, point.y);
-
-	//	App::ConsolePrintF("CALLING Hide(), %d", mpExpansionWindow->GetRealArea().Contains({ float(mouseX), float(mouseY) }));
-	//	mpMainWindow->SetFlag(UTFWin::kWinFlagVisible, true);
-	//	Hide();
-	//	return true;
-	//}
-
 	/* Update color (if the event happened in the wheel or value windows) */
 	if (msg.IsType(UTFWin::kMsgMouseMove) || msg.IsType(UTFWin::kMsgMouseDown))
 	{
@@ -201,12 +145,10 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	has to do (for example, adding an undo action) */
 	else if (msg.IsType(UTFWin::kMsgMouseUp))
 	{
-		App::ConsolePrintF("kMsgMouseUp   %d", mEditingColorType);
 		if (mEditingColorType != EditingType::None)
 		{
 			mEditingColorType = EditingType::None;
 			ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeMessage);
-			//TODO close swatch window if mouse is outside
 		}
 	}
 	/* Update color when we change the text field */
@@ -229,11 +171,6 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		mHsvColor.v = min(max(mHsvColor.v, 0.0f), 1.0f);
 		ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeRepaint);
 	}
-
-	/*if (window == mpValueWindow || window == mpWheelWindow || (mpTextField &&
-		(window == mpTextField->ToWindow() || window == mpTextField->ToWindow()->GetParent()))) {
-		return true;
-	}*/
 
 	if (msg.IsType(UTFWin::kMsgRefresh) && 
 		(msg.Refresh.window == mpValueWindow || 
@@ -459,12 +396,17 @@ void ColorWheelSwatchUI::ColorChanged(bool sendSporeMessage)
 
 		if (sendSporeMessage)
 		{
-			App::ConsolePrintF("Sending Spore message");
 			mOriginalColor = mColor;
-			picker->mpSelectedColorSwatch = this;
+
+			if (picker->mCustomColorIndex != -1) {
+				picker->mpColorUIs[picker->mCustomColorIndex]->mColor = mColor;
+			}
+			
 			Editors::ColorChangedMessage msg(
 				mColor.ToIntColor(), mpExpansionObject.get(), picker->mRegionFilter, false, mColorIndex);
 			MessageManager.MessageSend(msg.id, &msg);
+			picker->SetColor(mColor);
+			picker->mpSelectedColorSwatch = this;
 		}
 		else {
 			ChangeCreationColor(picker->mRegionFilter, mColor);
@@ -594,17 +536,6 @@ void ColorWheelSwatchUI::Update(int msTime, bool arg_4)
 		}
 		// more things here, but I think they never happen
 	}
-
-	/*int mouseX = Renderer.GetScreenInfo().mouseX;
-	int mouseY = Renderer.GetScreenInfo().mouseY;
-	Math::Point point;
-	mpExpansionWindow->ToLocalCoordinates2({ float(mouseX), float(mouseY) }, point);
-	bool insidePanel = mpExpansionWindow->ContainsPoint({ float(mouseX), float(mouseY) });
-	App::ConsolePrintF("%d     %f %f", insidePanel, point.x, point.y);
-
-	mpExpansionWindow->ToLocalCoordinates2({ float(mouseX), float(mouseY) }, point);
-	insidePanel = mpExpansionWindow->ContainsPoint({ float(mouseX), float(mouseY) });
-	App::ConsolePrintF("%d     %f %f", insidePanel, point.x, point.y);*/
 }
 
 void ColorWheelSwatchUI::UpdateCursorPositions()
@@ -711,7 +642,7 @@ void ColorWheelSwatchUI::ChangeCreationColor(int index, const ColorRGB& color)
 }
 
 
-void ColorSwatchUI_Update_detour::DETOUR(int msTime, bool arg2) {
+void ColorSwatchUI_Update__detour::DETOUR(int msTime, bool arg2) {
 	// If this is being called on our class, call our own method
 	auto p = object_cast<ColorWheelSwatchUI>(this);
 	if (p)

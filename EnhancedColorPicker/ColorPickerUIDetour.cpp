@@ -4,7 +4,7 @@
 
 #include <Spore\Properties.h>
 
-bool ColorPickerUI_Load_detour::DETOUR(
+bool ColorPickerUI_Load__detour::DETOUR(
 	UTFWin::IWindow* pWindow, uint32_t propID, uint32_t regionFilter, vector<ColorRGB>* pColors)
 {
 	// We have to recreate the original method
