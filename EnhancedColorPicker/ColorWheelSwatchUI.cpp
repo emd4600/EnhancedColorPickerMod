@@ -219,7 +219,7 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		mEditingColorType == EditingType::None && 
 		object_cast<UTFWin::ITextEdit>(window) == mpTextField)
 	{
-		if (mColor.ToIntColor() == mOriginalColor.ToIntColor()) 
+		if (mColor.ToIntColor() != mOriginalColor.ToIntColor()) 
 			ColorChanged(true);
 	}
 	else if (msg.IsType(UTFWin::kMsgMouseWheel) && mEditingColorType != EditingType::None &&
@@ -246,12 +246,13 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	}
 
 	if (msg.IsType(UTFWin::kMsgRefresh) &&
+		mIsLoaded && mIsShowingPanel &&
 		msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
 		msg.Refresh.window != mpExpansionWindow)
 	{
 		// This is the kind of emssage that makes ColorSwatchUI::HandleUIMessage() call Hide()
 		// Ensure we send a message if we were editing
-		if (mColor.ToIntColor() == mOriginalColor.ToIntColor())
+		if (mColor.ToIntColor() != mOriginalColor.ToIntColor())
 			ColorChanged(true);
 	}
 
@@ -455,11 +456,11 @@ void ColorWheelSwatchUI::ColorChanged(bool sendSporeMessage)
 		auto picker = object_cast<Palettes::ColorPickerUI>(mpExpansionObject.get());
 
 		picker->SetColor(mColor);
-		mOriginalColor = mColor;
 
 		if (sendSporeMessage)
 		{
 			App::ConsolePrintF("Sending Spore message");
+			mOriginalColor = mColor;
 			picker->mpSelectedColorSwatch = this;
 			Editors::ColorChangedMessage msg(
 				mColor.ToIntColor(), mpExpansionObject.get(), picker->mRegionFilter, false, mColorIndex);
