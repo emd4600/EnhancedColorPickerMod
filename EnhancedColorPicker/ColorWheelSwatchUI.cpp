@@ -245,6 +245,16 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 		return true;
 	}
 
+	if (msg.IsType(UTFWin::kMsgRefresh) &&
+		msg.Refresh.refreshType == UTFWin::RefreshType::kRefreshMouse &&
+		msg.Refresh.window != mpExpansionWindow)
+	{
+		// This is the kind of emssage that makes ColorSwatchUI::HandleUIMessage() call Hide()
+		// Ensure we send a message if we were editing
+		if (mColor.ToIntColor() == mOriginalColor.ToIntColor())
+			ColorChanged(true);
+	}
+
 	return ColorSwatchUI::HandleUIMessage(window, msg);
 }
 
