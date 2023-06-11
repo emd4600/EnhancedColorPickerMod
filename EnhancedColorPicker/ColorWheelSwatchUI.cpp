@@ -201,9 +201,9 @@ bool ColorWheelSwatchUI::HandleUIMessage(UTFWin::IWindow* window, const UTFWin::
 	has to do (for example, adding an undo action) */
 	else if (msg.IsType(UTFWin::kMsgMouseUp))
 	{
+		App::ConsolePrintF("kMsgMouseUp   %d", mEditingColorType);
 		if (mEditingColorType != EditingType::None)
 		{
-			App::ConsolePrintF("kMsgMouseUp   %d", mEditingColorType);
 			mEditingColorType = EditingType::None;
 			ColorChanged(false, IsAdvancedPaintCategory() ? ColorChangeType::OnlyUpdateUI : ColorChangeType::UpdateSporeMessage);
 			//TODO close swatch window if mouse is outside
@@ -309,7 +309,7 @@ void ColorWheelSwatchUI::InitValueSlider(uint32_t colorpickerImageGroupID)
 	mpValueCursor = UTFWin::IImageDrawable::AddImageWindow({ colorpickerEnhancedCursorImage, UTFWin::Image::kTypePNG, colorpickerImageGroupID },
 		0, 0, mpExpansionWindow.get());
 	mpValueCursor->SetFlag(UTFWin::kWinFlagVisible, true);
-	mpValueCursor->SetFlag(UTFWin::kWinFlagEnabled, true);
+	mpValueCursor->SetFlag(UTFWin::kWinFlagIgnoreMouse, true);
 }
 
 void ColorWheelSwatchUI::InitTextField(uint32_t colorpickerImageGroupID)
