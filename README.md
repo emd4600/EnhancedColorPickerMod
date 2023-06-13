@@ -8,8 +8,8 @@ This mod adds a color wheel to the editor, which lets you select the precise col
 
 ## Installation
 
-This mod requires the Galactic Adventures and the [ModAPI Launcher Kit](http://davoonline.com/sporemodder/rob55rod/ModAPI/Public/).
-1. If you don't have it yet, install the [ModAPI Launcher Kit](http://davoonline.com/sporemodder/rob55rod/ModAPI/Public/).
+This mod requires the Galactic Adventures and the [ModAPI Launcher Kit](https://davoonline.com/sporemodder/rob55rod/ModAPI/Public/).
+1. If you don't have it yet, install the [ModAPI Launcher Kit](https://davoonline.com/sporemodder/rob55rod/ModAPI/Public/).
 2. Download the `EnhancedColorPicker.sporemod` file from the [releases page](https://github.com/emd4600/EnhancedColorPickerMod/releases/latest).
 3. Execute the ![](https://sporemodder.files.wordpress.com/2017/07/easy-installer-icon-small.png?w=43&zoom=2) **Easy Installer**. It will show a file chooser dialog, find the `EnhancedColorPicker.sporemod` file you just downloaded.
 4. Done!
